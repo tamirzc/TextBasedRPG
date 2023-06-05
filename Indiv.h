@@ -1,67 +1,50 @@
 #include <string>
 #include "powers.h"
+#include "items.h"
+#include "map.h"
+
 
 Power defPower(-1,"NULL",-1,-1,-1);
+Item defItem(-1,"NULL",-1,-1);
+Room defRoom(-1,-1,-1,-1,-1,"NULL");
 
 //Indiv class, from individual - a class of every character
 class Indiv
 {
     std::string name;//name
     int HP;//Health point
-    int items[3] = {0,0,0};//list of items held
+    Item items[3] = {defItem,defItem,defItem};//list of items held
     Power powers[2] = {defPower,defPower};//list of powers of the Indiv
     int STR;//strength of Indiv
     int DEF;//defence of Indiv
-    int location;//location in the map
+    Room location = defRoom;//location in the map
+    bool alive = true;
     
     public:
 
     //constructor
-    Indiv(std::string nam, int health, int strength, int defence, int locate)
+    Indiv(std::string nam, int health, int strength, int defence, Room* locate)
     {
         name = nam;
         HP = health;
         STR = strength;
         DEF = defence;
-        location = locate;
+        location = *locate;
     }
     
     //gets the name of the individual
     std::string getName(){
         return name;
     }
-    //check if bag is full, if not add item
-    int setItems(int newItem){
-        for(int i : items){
-            if(items[i] != 0){
-                items[i]=newItem;
-                break;
-            }
-            else {
-                return -1;
-            }
-            return 0;
-        }
+    //set alive status
+    void setAlive(bool status){
+        alive = status; //true for alive, false for dead
+        return;
     }
-    //get items array
-    int* getItems(){
-        return items;
-    }
-    //check if have all powers, if not add one
-    void setPower(Power newPower){
-        for(int i=0; i<=1;i++){
-            int idnum = powers[i].getId();
-            if(idnum == -1){
-                powers[i]=newPower;
-                break;
-            }
-            return;
-        }
-    }
-    //get items array
-    Power* getPower(){
-        return powers;
-    }
+    //get alive status
+    bool getAlive(){
+        return alive;
+    }    
     //set HP to a new value
     void setHP(int newHPVal){
         HP = newHPVal;
@@ -72,12 +55,12 @@ class Indiv
         return HP;
     }
     //calculate damage in battle, and returns 1 if the Indiv died.
-    int setDamagetoHP(int damage){
+    void setDamagetoHP(int damage){
         setHP(HP - damage);
         if(HP <= 0){
-            return -1;
+            setAlive(false);
         }
-        return 0;
+        return;
     }
     //set STR to a new value
     void setSTR(int newSTRVal){
@@ -98,14 +81,64 @@ class Indiv
         return DEF;
     }
     //change location of Indiv, send 1 if tries to go to a wrong place
-    int setLocation(int newLoc){
-        location = newLoc;
-        //check need to be done when map is made!
-        return 0;
+    void setLocation(Room *newLoc){
+        location = *newLoc;
+        return;
     }    
     //get the location of the Indiv
-    int getLocation(){
-        return location;
+    Room* getLocation(){
+        return &location;
+    }
+    //check if bag is full, if not add item
+    bool setItem(Item newItem){
+        bool isInserted = false; //check if the new item was inserted
+        for(int i=0; i<=2; i++){
+            if(items[i].getId() == -1){
+                items[i]=newItem;
+                if(items[i].getEffect() == 0){
+                    setSTR(STR+items[i].getStrength());
+                }
+                else if(items[i].getEffect() == 1){
+                    setDEF(DEF+items[i].getStrength());
+                }
+                isInserted = true; //item was inserted
+                break;
+            }
+        }
+        if(isInserted == true){
+            return true;//insertion is Ok
+        }
+        else{
+            return false;//items are full
+        }
+
+    }
+    //get items array
+    Item* getItems(){
+        return items;
+    }
+    //check if have all powers, if not add one
+    bool setPower(Power newPower){
+        int idnum;
+        bool isInserted = false; //check if the new power was inserted
+        for(int i=0; i<=1;i++){
+            idnum = powers[i].getId();
+            if(idnum == -1){
+                powers[i]=newPower;
+                isInserted = true;
+                break;
+            }
+        }
+        if(isInserted == true){
+            return true;//insertion is Ok
+        }
+        else{
+            return false;//items are full
+        }
+    }
+    //get items array
+    Power* getPower(){
+        return powers;
     }
   
 };
