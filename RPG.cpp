@@ -11,8 +11,6 @@ bool fight(Indiv player, Indiv monster){
 char goNext(Indiv player){
     int w,e,n,s;//directions available to travel: is west/east/north/south available at the current location?
     char inputDir;//direction decided by the user
-
-
     Room* current = player.getLocation();
     
     w = current->getWest();
@@ -52,8 +50,20 @@ char goNext(Indiv player){
     else{
         return 'j'; //error sign, the player will be hurt.
     }
+}
 
-
+Indiv* checkEnemies(Indiv player, Indiv* enemies, int numOfEn){
+    int currEnLoc, roomId;
+    //get roomId
+    roomId = player.getLocation()->getId();
+    //go through enemy array, check which one is in room roomId
+    for(int i=0;i<numOfEn;i++){
+        currEnLoc = (*(enemies+i)).getLocation()->getId();
+        if(currEnLoc == roomId){
+            return (enemies+i);
+        }
+    }
+    return NULL;
 }
 
 int main() {
@@ -73,10 +83,10 @@ int main() {
     string fireballString = "a fireball comes out of your hand and scorches the enemy.";
 
     string room0String = "As you enter the room, a scream pierces the silence, freezing your blood. There is no turning back. You look at the vast room, your eyes getting accostumed to the darkness inside. As you look around, you spot a small item, laying in the back of the room, giving a dull shine. Pacing back and forth, a huge black creature. Stretching its four legs as he goes, the fur on his back shimmers, his big fangs shine like two crescent moons. In his red gleaming eyes, you see death. WWYD?\n1. Leave as you came, this things are not for you. \n2. Try to sneak behind and get the item.\n3. Take the little b1tch head on.\n4. Leave the room to the west, and take the stairs to the basement.";
-    string room1String = "As you enter the room, a scream pierces the silence, freezing your blood. There is no turning back. You look at the vast room, your eyes getting accostumed to the darkness inside. As you look around, you spot a small item, laying in the back of the room, giving a dull shine. Pacing back and forth, a huge black creature. Stretching its four legs as he goes, the fur on his back shimmers, his big fangs shine like two crescent moons. In his red gleaming eyes, you see death. WWYD?\n1. Leave as you came, this things are not for you. \n2. Try to sneak behind and get the item.\n3. Take the little b1tch head on.\n4. Leave the room to the west, and take the stairs to the basement.";
-    string room2String = "As you enter the room, a scream pierces the silence, freezing your blood. There is no turning back. You look at the vast room, your eyes getting accostumed to the darkness inside. As you look around, you spot a small item, laying in the back of the room, giving a dull shine. Pacing back and forth, a huge black creature. Stretching its four legs as he goes, the fur on his back shimmers, his big fangs shine like two crescent moons. In his red gleaming eyes, you see death. WWYD?\n1. Leave as you came, this things are not for you. \n2. Try to sneak behind and get the item.\n3. Take the little b1tch head on.\n4. Leave the room to the west, and take the stairs to the basement.";
-    string room3String = "As you enter the room, a scream pierces the silence, freezing your blood. There is no turning back. You look at the vast room, your eyes getting accostumed to the darkness inside. As you look around, you spot a small item, laying in the back of the room, giving a dull shine. Pacing back and forth, a huge black creature. Stretching its four legs as he goes, the fur on his back shimmers, his big fangs shine like two crescent moons. In his red gleaming eyes, you see death. WWYD?\n1. Leave as you came, this things are not for you. \n2. Try to sneak behind and get the item.\n3. Take the little b1tch head on.\n4. Leave the room to the west, and take the stairs to the basement.";
-    string room4String = "As you enter the room, a scream pierces the silence, freezing your blood. There is no turning back. You look at the vast room, your eyes getting accostumed to the darkness inside. As you look around, you spot a small item, laying in the back of the room, giving a dull shine. Pacing back and forth, a huge black creature. Stretching its four legs as he goes, the fur on his back shimmers, his big fangs shine like two crescent moons. In his red gleaming eyes, you see death. WWYD?\n1. Leave as you came, this things are not for you. \n2. Try to sneak behind and get the item.\n3. Take the little b1tch head on.\n4. Leave the room to the west, and take the stairs to the basement.";
+    string room1String = "You are in room 1";
+    string room2String = "You are in room 2";
+    string room3String = "You are in room 3";
+    string room4String = "You are in room 4";
 
 
     string loseString = "You leave the castle, defeated. As you put your leg out of the castle door, you hear whispers. They start as murmurs, lurking inside your ears. You wait for them to stop, but they just get louder. And louder. Their sinister meaning evading you, but you know they mean you ill. As the first ray of sunshine pierces the fog at the door, the mumur gets so loud, you kneel in their power. You close your ears, hopping they would go, but they just pierce your ears and brain, unrelenting. The curse slowly start boiling inside of you, filling you with dark, black fog, as the chanting pierces your brain. In your last breath, you understand you made a mistake coming here.";
@@ -87,14 +97,21 @@ int main() {
     //powers
     Power fireball(0,fireballString,20,3,0);
     //map
-    Room room0(0,-1,-1,-1,1,room0String);//start room
-    Room room1(1,4,3,0,2,room1String);
-    Room room2(2,-1,1,-1,-1,room2String);
-    Room room3(3,-1,-1,-1,1,room3String);
-    Room room4(4,-1,-1,1,-1,room4String);//end room
+    Room room0(0,-1,-1,-1,1,room0String);//start room, bedroom
+    Room room1(1,4,3,0,2,room1String);//main hall
+    Room room2(2,-1,1,-1,-1,room2String);//play room
+    Room room3(3,-1,-1,-1,1,room3String);//kitchen
+    Room room4(4,-1,-1,1,-1,room4String);//end room, livingroom
     Room Castle[5]={room0,room1,room2,room3,room4};
 
 
+    //Enemies
+    Indiv shadowDog("The Shadow Dog",30,20,10,&room0);//dog
+    Indiv horrorKid("The Small Horror",50,10,20,&room2);//bro
+    Indiv bloatWoman("The Bloating Gore",120,5,40,&room3);//mom
+    Indiv witch("The Witch",170,30,20,&room4);//dad
+    Indiv enemies[4]={shadowDog,horrorKid,bloatWoman,witch};
+    Indiv* currEn;
 
 
 
@@ -106,6 +123,7 @@ int main() {
     cout << room0.getDesc() << "\n";
 
     while (gameOn){
+        currEn = checkEnemies(player,enemies,4);
         cin >> inputFromUser;
         switch (inputFromUser){
             case 1:
@@ -121,13 +139,30 @@ int main() {
                 break;
             case 4:
             //if the monster not dead, express that in string, and change chance to fight if back to 100%. also add chance to fail.
+                if(currEn->getAlive()){
+                    break;//change according to above comment
+                }
                 dir = goNext(player);
                 switch(dir){
                     case 'w':
                         dirId = player.getLocation()->getWest();
-                        player.setLocation(&Castle[dirId]);
-                        cout << player.getLocation()->getDesc();//change and update for every case
                         break;
+                    case 'e':
+                        dirId = player.getLocation()->getEast();
+                        break;
+                    case 'n':
+                        dirId = player.getLocation()->getNorth();
+                        break;
+                    case 's':
+                        dirId = player.getLocation()->getSouth();
+                        break;
+                    default:
+                        cout << dontFollowOrder;
+                        gameOn = false;
+                }
+                if(gameOn){
+                    player.setLocation(&Castle[dirId]);
+                    cout << player.getLocation()->getDesc();
                 }
                 break;
             default:
