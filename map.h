@@ -10,8 +10,8 @@ class Room{
     int eastid;//id of room to east. -1 if wall
     int southid;//id of room to south. -1 if wall
     int westid;//id of room to west. -1 if wall
-
     std::string description;//description in the entrance to the room
+    bool visited = false;//checks if the plater visited the room.
 
     public:
     //constructor
@@ -43,5 +43,14 @@ class Room{
     //get description
     std::string getDesc(){
         return description;
+    }
+    //get visited
+    bool getVisited(){
+        return visited;
+    }
+    //set visited
+    void setVisited(bool state){
+        visited = state;
+        return;
     }
 };

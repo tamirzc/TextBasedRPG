@@ -52,6 +52,7 @@ char goNext(Indiv player){
     }
 }
 
+//checks which enemy is in the room
 Indiv* checkEnemies(Indiv player, Indiv* enemies, int numOfEn){
     int currEnLoc, roomId;
     //get roomId
@@ -66,9 +67,45 @@ Indiv* checkEnemies(Indiv player, Indiv* enemies, int numOfEn){
     return NULL;
 }
 
+//fight function, checks if the the enemy is beaten(true) or not(false).
+bool fightFunction(Indiv player, Indiv enemy, string dontFollowOrder){
+    fightOn = true;//check if fight is finished
+    string battleString = "1. Use melee attack.\n2.Use magic.\n3.Use healing item.\n"
+    int input, damageToEnemy, damageToPlayer;
+    cout << "the battle begins:\n";
+    while(fightOn){
+        cout << battleString;
+        cin >> input
+        switch (input){
+        case 1://melee
+            damageToEnemy = player.getSTR()-enemy.getDEF();
+            cout << "You do " << damageToEnemy <<  " damage to the enemy.\n"
+            break;
+        case 2://magic
+            //TODO:
+            //choose power
+            //calc the damage
+            //lower pp
+            damageToEnemy = player.;
+            cout << "You do " << damageToEnemy <<  " damage to the enemy.\n"
+            break; 
+        case 3://healing
+            /* code */
+            break;       
+        default:
+            cout << dontFollowOrder; 
+            fightOn = false;
+            return false;
+        }
+        //if fightOn=true and not used healing item, calc damage. if enemy die, return 1.
+        //rand what enemy do, 1 or 2. print to screen and calc damage. if player die, exit loop and return 0.
+    }
+    return false;
+}
+
 int main() {
     //declare and initialize variables
-    bool gameOn = true; //finish the game or not
+    bool gameOn = true; //the game is on or not
     int inputFromUser; //input in main menu
     char dir; //choose direction to go: w,e,n,s
     int dirId; //the id of next room
@@ -88,6 +125,8 @@ int main() {
     string room3String = "You are in room 3";
     string room4String = "You are in room 4";
 
+    string backToRoomString = "You go back to the prvious room. The stench and horror still there, waiting for you.\n";
+    string enemyAliveString = "As you open the door, the hinges creek, making an horrendous sound. The monster turnes around slowly, and with a deep growl lunges at you.\n";
 
     string loseString = "You leave the castle, defeated. As you put your leg out of the castle door, you hear whispers. They start as murmurs, lurking inside your ears. You wait for them to stop, but they just get louder. And louder. Their sinister meaning evading you, but you know they mean you ill. As the first ray of sunshine pierces the fog at the door, the mumur gets so loud, you kneel in their power. You close your ears, hopping they would go, but they just pierce your ears and brain, unrelenting. The curse slowly start boiling inside of you, filling you with dark, black fog, as the chanting pierces your brain. In your last breath, you understand you made a mistake coming here.";
 
@@ -138,10 +177,7 @@ int main() {
             //fight function, in there option to use item to heal, use power or attack (besides healing,everything is with rand)
                 break;
             case 4:
-            //if the monster not dead, express that in string, and change chance to fight if back to 100%. also add chance to fail.
-                if(currEn->getAlive()){
-                    break;//change according to above comment
-                }
+            //going back:if the monster not dead, express that in string, and change chance to fight if back to 100%. also add chance to fail.
                 dir = goNext(player);
                 switch(dir){
                     case 'w':
@@ -162,6 +198,20 @@ int main() {
                 }
                 if(gameOn){
                     player.setLocation(&Castle[dirId]);
+                    //if going back to a room
+                    if(player.getLocation()->getVisited()){
+                        cout << backToRoomString;
+                            if(currEn->getAlive()){
+                                cout << enemyAliveString;
+                                //fightFucntion();
+                                //continue according to result
+                            break;
+                        }
+                    }
+                    //if it is a new room
+                    else{
+
+                    }
                     cout << player.getLocation()->getDesc();
                 }
                 break;
